@@ -36,10 +36,6 @@ X_test_vec = vectorizer.transform(X_test)
 # Train the model
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train_vec, y_train)
-y_prediction = model.predict(X_test_vec)  # final y prediction values from the model
-accuracy = accuracy_score(
-    y_test, y_prediction
-)  # accuracy of the model compared to actual y test values
 
 # Save the trained model and vectorizer (wb = write binary)
 pickle.dump(model, open("./Models/model_category.pkl", "wb"))
