@@ -2,8 +2,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.model_selection import GridSearchCV
 import pickle
 from sklearn.metrics import mean_absolute_error, r2_score
 import numpy as np
@@ -61,22 +63,34 @@ description_vec = description_vectorizer.fit_transform(data['Description'])     
 
 # Combine all features into a single feature se (hstack = horizontal stack)
 # This creates 1002 columns. 1000 from description, 1 from Category_enc, 1 from Price_enc
-success_features = np.hstack((
+features = np.hstack((
     description_vec.toarray(),
     data[['Category_enc', 'Price_enc']].values
 ))
 
 X_train, X_test, y_train, y_test = train_test_split(
-    success_features, data['Success'], test_size=0.2, random_state=42
+    features, data['Success'], test_size=0.2, random_state=42
 )  # 80% train, 20% test split
 model_success = RandomForestClassifier(n_estimators=100, random_state=42)
 model_success.fit(X_train, y_train)  # train the model
 print(f"Success Model Accuracy: {accuracy_score(y_test, model_success.predict(X_test)) * 100:.2f}%")
 
-# Save models and vectorizers using pickle
-pickle.dump(model_category, open("./Models/model_category.pkl", "wb"))
-pickle.dump(vectorizer, open("./Models/vectorizer_category.pkl", "wb"))
-pickle.dump(category_encoder, open("./Models/label_encoder_category.pkl", "wb"))
-pickle.dump(price_encoder, open("./Models/label_encoder_price.pkl", "wb"))
-pickle.dump(description_vectorizer, open("./Models/vectorizer_description.pkl", "wb"))
-pickle.dump(model_success, open("./Models/model_success.pkl", "wb"))
+# TODO: Model 2B: Prediciting upvotes
+y_log = np.log1p(data['Upvotes'])                   # log(1 + x) transformation to reduce skewness
+X_train, X_test, y_train, y_test = train_test_split(
+    features, y_log, test_size=0.2, random_state=42
+)  # 80% train, 20% test split
+model_upvotes = Ridge(alpha=1.0)
+model_upvotes.fit(X_train, y_train)
+y_pred_log = model_upvotes.predict(X_test)
+y_pred = np.expm1(y_pred_log)                       # inverse of log1p to get original scale
+print("R2 Score:", r2_score(y_test, y_pred))
+print("Mean Absolute Error:", mean_absolute_error(y_test, y_pred))
+
+# # Save models and vectorizers using pickle
+# pickle.dump(model_category, open("./Models/model_category.pkl", "wb"))
+# pickle.dump(vectorizer, open("./Models/vectorizer_category.pkl", "wb"))
+# pickle.dump(category_encoder, open("./Models/label_encoder_category.pkl", "wb"))
+# pickle.dump(price_encoder, open("./Models/label_encoder_price.pkl", "wb"))
+# pickle.dump(description_vectorizer, open("./Models/vectorizer_description.pkl", "wb"))
+# pickle.dump(model_success, open("./Models/model_success.pkl", "wb"))
