@@ -43,7 +43,7 @@ st.markdown(
 st.title("ValidAI", anchor=False, text_alignment="center")
 # Option 2: Light blue background
 st.markdown(
-    "<h4 style='text-align: center; margin-top: -1rem; margin-bottom: 1rem;'>Validate your vision against <span style='background-color: #E0F2FF; color: #374151; padding: 4px 8px; border-radius: 5px; font-weight: 700;'>4000 existing AI tools</span></h4>",
+    "<h4 style='text-align: center; margin-top: -1rem; margin-bottom: 1rem;'>Validate your vision against <span style='background-color: #DDD6FE; color: #374151; padding: 4px 8px; border-radius: 5px; font-weight: 700;'>4000 existing AI tools</span></h4>",
     unsafe_allow_html=True,
 )
 
