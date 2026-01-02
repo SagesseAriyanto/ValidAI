@@ -36,7 +36,10 @@ def predict_success(description, category, price):
     success_prob = int(success_model.predict_proba(features)[0][1] * 100)
     return success_prob
 
-
+st.markdown(
+    "<div style='text-align: center; font-size: 4rem; margin-bottom: -2.5rem;'>🤖</div>",
+    unsafe_allow_html=True,
+)
 st.title("ValidAI", anchor=False, text_alignment="center")
 # Option 2: Light blue background
 st.markdown(
@@ -44,9 +47,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-company_name = st.text_input("Enter your AI company name:")
-description = st.text_area("Enter a brief description of your AI company:")
+# Option 1: Soft white with purple accents (clean, professional)
+description = st.text_area(
+    "description",
+    height=150,
+    max_chars=300,
+    placeholder="Briefly describe your AI tool",
+    label_visibility="collapsed",
+)
+st.markdown(
+    """
+<style>
+textarea {
+resize: none !important;
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 if st.button("Predict"):
     if description:
