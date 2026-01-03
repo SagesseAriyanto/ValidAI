@@ -127,13 +127,13 @@ with validate_tab:
             median_size = get_median_size()
             percent_diff = round(((companies_count - median_size) / median_size) * 100, 1)
             if percent_diff <= -10:
-                count_text = f"{percent_diff}% less comp"
+                count_text = f"{percent_diff}% less"
                 count_color = "inverse"
             elif percent_diff < 10:
-                count_text = f"{percent_diff}% average comp"
+                count_text = f"{percent_diff}% average"
                 count_color = "off"
             else:
-                count_text = f"{percent_diff}% more comp"
+                count_text = f"{percent_diff}% more"
                 count_color = "inverse"
 
             average_total_success = get_average_success()
@@ -150,7 +150,7 @@ with validate_tab:
 
             col1.metric(
                 label="Market",
-                value=f"{category}",
+                value=category,
                 width="stretch",
                 delta_arrow="off",
                 border=True,
@@ -161,7 +161,7 @@ with validate_tab:
 
             col2.metric(
                 label="Competition",
-                value=f"{companies_count}",
+                value=companies_count,
                 border=True,
                 help="Number of existing tools in this specific market.",
                 delta=count_text,
@@ -172,7 +172,7 @@ with validate_tab:
             # We use your 'success_scores' list to draw a mini trend line inside the card.
             col3.metric(
                 label="Score",
-                value=f"{success_avg}%",
+                value=f"{success_avg}",
                 border=True,
                 help="Success probability across different pricing models (Free vs Paid).",
                 delta=success_text,
