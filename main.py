@@ -46,11 +46,12 @@ def get_rank(category):
     window = category_counts.iloc[start-1:end].copy()
     return (rank, total, window)
 
-get_rank("Productivity")
-def get_median_size() -> float:
+def get_median_size(category_list) -> float:
     df = load_data()
-    print(df["Category"].value_counts())
-    return round(df["Category"].value_counts().median(),1)
+    counts = df["Category"].value_counts()
+    category_count = [counts.get(cat, 0) for cat in category_list]
+    median_size = round(counts.median(), 1)
+    return (median_size, category_count)
 
 def get_average_success() -> float:
     df = load_data()
@@ -150,7 +151,7 @@ with validate_tab:
             window_labeled["Label"] = window_labeled.index.to_series().add(1).astype(str) + ". " + window_labeled["Category"]
 
             # Data for second column (Competition)
-            median_size = get_median_size()
+            median_size, cat_count_list = get_median_size(category_list)
             percent_diff = round(((companies_count - median_size) / median_size) * 100, 1)
             if percent_diff <= -10:
                 count_text = f"{percent_diff}% low"
