@@ -212,10 +212,17 @@ with validate_tab:
                 delta_color=success_color,
             )
 
-            # Create chart dataframe
+            # Create chart dataframe with bold labels for predicted category
+            labels = []
+            for r, c in zip(rank_list, category_list):
+                label = f"{r}. {c}"
+                if c == category:
+                    label = f"<b>{label}</b>"
+                labels.append(label)
+            
             chart_df = pd.DataFrame(
                 {
-                    "Label": [f"{r}. {c}" for r, c in zip(rank_list, category_list)],
+                    "Label": labels,
                     "Upvotes": upvote_list,
                     "Competition": cat_count_list,
                 }
@@ -231,8 +238,12 @@ with validate_tab:
                 barmode="group",
                 log_y=True,  # Log scale for visibility
                 color_discrete_map={"Upvotes": "#C4B5FD", "Competition": "#FB923C"},
+                hover_data={"Label": False, "Metric": True, "Value": True}
             )
-            fig.update_xaxes(title_text="", tickangle=25)
+            fig.update_xaxes(
+                title_text="",
+                tickangle=20,
+            )
             fig.update_yaxes(title_text="")
             fig.update_layout(
                 height=400,
