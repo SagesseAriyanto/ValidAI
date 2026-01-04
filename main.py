@@ -62,6 +62,16 @@ def get_average_success() -> float:
     df["Success"] = (df["Upvotes"] >= df["Category_median"]).astype(int)
     return round(df["Success"].mean() * 100, 1)
 
+def get_top_bottom_tools(category):
+    df = load_data()
+    category_df = df[df['Category'] == category].copy()
+    top_tools = category_df.nlargest(3, 'Upvotes')[['Name', 'Price', 'Link']]
+    top_tools["Price"] = top_tools["Price"].fillna("N/A")
+    bottom_tools = category_df.nsmallest(3, 'Upvotes')[['Name', 'Price', 'Link']]
+    bottom_tools["Price"] = bottom_tools["Price"].fillna("N/A")
+    return top_tools, bottom_tools
+
+get_top_bottom_tools("Productivity")
 def predict_category(desciption):
     category_model, category_vectorizer, _, _, _, _ = load_models()
 
@@ -197,7 +207,7 @@ with validate_tab:
                 label="Competition",
                 value=companies_count,
                 border=True,
-                help="Existing Tools in this category (lower = less crowded)",
+                help="Existing Tools in this category (lower = less saturated)",
                 delta=count_text,
                 delta_color=count_color,
             )
