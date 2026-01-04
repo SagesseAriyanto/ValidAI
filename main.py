@@ -65,13 +65,26 @@ def get_average_success() -> float:
 def get_top_bottom_tools(category):
     df = load_data()
     category_df = df[df['Category'] == category].copy()
-    top_tools = category_df.nlargest(3, 'Upvotes')[['Name', 'Price', 'Link']]
+
+    # Top 25% by upvotes
+    top_threshold = category_df['Upvotes'].quantile(0.75)
+    top_pool = category_df[category_df['Upvotes'] >= top_threshold]
+    top_tools = top_pool.sample(n=min(3, len(top_pool)), random_state=None)[
+        ["Name", "Price", "Link"]
+    ]
+
+    # Bottom 25% by upvotes
+    bottom_threshold = category_df['Upvotes'].quantile(0.25)
+    bottom_pool = category_df[category_df['Upvotes'] <= bottom_threshold]
+    bottom_tools = bottom_pool.sample(n=min(3, len(bottom_pool)), random_state=None)[
+        ["Name", "Price", "Link"]
+    ]
+
+    # Fill missing prices
     top_tools["Price"] = top_tools["Price"].fillna("N/A")
-    bottom_tools = category_df.nsmallest(3, 'Upvotes')[['Name', 'Price', 'Link']]
     bottom_tools["Price"] = bottom_tools["Price"].fillna("N/A")
     return top_tools, bottom_tools
 
-get_top_bottom_tools("Productivity")
 def predict_category(desciption):
     category_model, category_vectorizer, _, _, _, _ = load_models()
 
@@ -281,19 +294,19 @@ with validate_tab:
                 for counter, (_, row) in enumerate(top_tools.iterrows()):
                     with cols[counter]:
                         with st.container(border=True):
-                            st.markdown(f"##### {row['Name']}")                 # h5 header
+                            st.write(f"**{row['Name']}**")                 
                             st.markdown(f"**`{row['Price']}`**")                # bold monospaced price
                             st.markdown(
                                 f'<a href="{row["Link"]}" style="padding: 4px 12px; border: 1px solid #9CA3AF; border-radius: 4px; text-decoration: none; color: #6B7280; font-size: 0.75rem; font-weight:500;">Visit</a>',
                                 unsafe_allow_html=True,
                             )
 
-            with st.expander("Least Trending in Category", expanded=False):
+            with st.expander("Least Trending in Category", expanded=True):
                 cols = st.columns(3)
                 for counter, (_, row) in enumerate(bottom_tools.iterrows()):
                     with cols[counter]:
                         with st.container(border=True):
-                            st.markdown(f"##### {row['Name']}")                 
+                            st.write(f"**{row['Name']}**")                 
                             st.markdown(f"**`{row['Price']}`**")
                             st.markdown(
                                 f'<a href="{row["Link"]}" style="padding: 4px 12px; border: 1px solid #9CA3AF; border-radius: 4px; text-decoration: none; color: #6B7280; font-size: 0.75rem; font-weight:500;">Visit</a>',
