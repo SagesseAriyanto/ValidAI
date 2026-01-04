@@ -229,7 +229,7 @@ with validate_tab:
                 if c == category:
                     label = f"<b>{label}</b>"
                 labels.append(label)
-            
+
             chart_df = pd.DataFrame(
                 {
                     "Label": labels,
@@ -271,23 +271,36 @@ with validate_tab:
             )
             st.plotly_chart(fig)
 
-            # # Plotly bar chart
-            # # Melt for grouped bars
-            # # Melt for grouped bars
-            # chart_melted = chart_df.melt(id_vars="Label", var_name="Metric", value_name="Value")
+            # Top and Bottom Tools
+            top_tools, bottom_tools = get_top_bottom_tools(category)
+            with st.expander("Most Popular", expanded=True):
+                # Create a list of 3 columns
+                cols = st.columns(3)
 
-            # fig = px.bar(
-            #     chart_melted,
-            #     x="Label",
-            #     y="Value",
-            #     color="Metric",
-            #     barmode="group",
-            #     log_y=True,  # Log scale for visibility
-            #     labels={"Label": "Category (Rank)", "Value": "Count (log scale)"},
-            # )
+                # Loop through each row of dataframe (ignore index)
+                for counter, (_, row) in enumerate(top_tools.iterrows()):
+                    with cols[counter]:
+                        with st.container(border=True):
+                            st.markdown(f"##### {row['Name']}")                 # h5 header
+                            st.markdown(f"**`{row['Price']}`**")                # bold monospaced price
+                            st.markdown(
+                                f'<a href="{row["Link"]}" style="padding: 4px 12px; border: 1px solid #9CA3AF; border-radius: 4px; text-decoration: none; color: #6B7280; font-size: 0.75rem; font-weight:500;">Visit</a>',
+                                unsafe_allow_html=True,
+                            )
 
-            # fig.update_layout(height=300)
-            # st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+
+
+            with st.expander("Least Popular", expanded=False):
+                cols = st.columns(3)
+                for counter, (_, row) in enumerate(bottom_tools.iterrows()):
+                    with cols[counter]:
+                        with st.container(border=True):
+                            st.markdown(f"##### {row['Name']}")                 
+                            st.markdown(f"**`{row['Price']}`**")
+                            st.markdown(
+                                f'<a href="{row["Link"]}" style="padding: 4px 12px; border: 1px solid #9CA3AF; border-radius: 4px; text-decoration: none; color: #6B7280; font-size: 0.75rem; font-weight:500;">Visit</a>',
+                                unsafe_allow_html=True,
+                            )
 
 # Chat Tab
 with chat_tab:
