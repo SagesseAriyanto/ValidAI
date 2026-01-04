@@ -33,6 +33,7 @@ def get_rank(category):
 
 def get_median_size() -> float:
     df = load_data()
+    print(df["Category"].value_counts())
     return round(df["Category"].value_counts().median(),1)
 
 def get_average_success() -> float:
@@ -106,15 +107,19 @@ with validate_tab:
     )
 
     if description:
+        # Prediction and Metrics Display
         with st.spinner("Analyzing..."):
+
+            # Load additional metrics
             category = predict_category(description)
             companies_count = get_company_counts(category)
             price_types = ["Free", "Freemium", "Paid"]
             success_scores = [predict_success(description, category, price) for price in price_types]
             success_avg = round(sum(success_scores) / len(success_scores))
-            col1, col2, col3 = st.columns([2.07,1,1])
 
-            # Load additional metrics
+            col1, col2, col3 = st.columns([2.07,1,1])               # Split into 3 columns and adjust spacing
+
+            # Data for first column (Market)
             rank, total_categories = get_rank(category)
             rank_text = f"Rank {rank} of {total_categories}"
             if rank <= 5:
@@ -124,59 +129,65 @@ with validate_tab:
             else:
                 rank_color = "inverse"
 
+            # Data for second column (Competition)
             median_size = get_median_size()
             percent_diff = round(((companies_count - median_size) / median_size) * 100, 1)
             if percent_diff <= -10:
-                count_text = f"{percent_diff}% less"
+                count_text = f"{percent_diff}% low"
                 count_color = "inverse"
             elif percent_diff < 10:
                 count_text = f"{percent_diff}% average"
                 count_color = "off"
             else:
-                count_text = f"{percent_diff}% more"
                 count_color = "inverse"
+                if percent_diff >= 300:
+                    count_text = f"{300}%+ high"
+                else:
+                    count_text = f"{percent_diff}% high"
 
+            # Data for third column (Score)
             average_total_success = get_average_success()
             success_diff = round(success_avg - average_total_success,1)
             if success_diff >= 10:
-                success_text = f"{success_diff}% above avg"
+                success_text = f"{success_diff}% high"
                 success_color = "normal"
             elif success_diff <= -10:
-                success_text = f"{success_diff}% below avg"
+                success_text = f"{success_diff}% low"
                 success_color = "normal"
             else:
-                success_text = f"{success_diff}% near avg"
+                success_text = f"{success_diff}% average"
                 success_color = "off"
 
+            # Market Metrics
             col1.metric(
                 label="Market",
                 value=category,
                 width="stretch",
                 delta_arrow="off",
                 border=True,
-                help="The identified category based on your description.",
+                help="Category rank by total upvotes (higher = more popular)",
                 delta=rank_text,
-                delta_color=rank_color
+                delta_color=rank_color,
             )
 
+            # Competition Metrics
             col2.metric(
                 label="Competition",
                 value=companies_count,
                 border=True,
-                help="Number of existing tools in this specific market.",
+                help="Existing Tools in this category (lower = less crowded)",
                 delta=count_text,
-                delta_color=count_color
+                delta_color=count_color,
             )
 
-            # 3. SCORE (Uses 'chart_data' from your list!)
-            # We use your 'success_scores' list to draw a mini trend line inside the card.
+            # Score Metrics
             col3.metric(
                 label="Score",
                 value=f"{success_avg}",
                 border=True,
-                help="Success probability across different pricing models (Free vs Paid).",
+                help="Predicted success score out of 100 (higher = better chance)",
                 delta=success_text,
-                delta_color=success_color
+                delta_color=success_color,
             )
 
 
