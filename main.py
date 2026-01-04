@@ -29,8 +29,24 @@ def get_rank(category):
     df = load_data()
     category_counts = df.groupby("Category", as_index=False)["Upvotes"].sum().sort_values(by="Upvotes", ascending=False).reset_index(drop=True)
     rank = category_counts.loc[category_counts['Category'] == category].index[0] + 1
-    return (rank, len(category_counts))
+    total = len(category_counts)
 
+    # Finding 5-category window
+    start = max(1, rank - 2)            
+    end = min(total, rank + 2)
+
+    # Check if window is less than 5 and adjust
+    count = end - start + 1
+    missing = 5 - count
+    if missing > 0:
+        start = max(1, start - missing)
+        end = min(total, end + missing)
+    
+    # Select and copy the window
+    window = category_counts.iloc[start-1:end].copy()
+    return (rank, total, window)
+
+get_rank("Productivity")
 def get_median_size() -> float:
     df = load_data()
     print(df["Category"].value_counts())
@@ -120,7 +136,7 @@ with validate_tab:
             col1, col2, col3 = st.columns([2.07,1,1])               # Split into 3 columns and adjust spacing
 
             # Data for first column (Market)
-            rank, total_categories = get_rank(category)
+            rank, total_categories, window = get_rank(category)
             rank_text = f"Rank {rank} of {total_categories}"
             if rank <= 5:
                 rank_color = "normal"
@@ -128,6 +144,10 @@ with validate_tab:
                 rank_color = "off"
             else:
                 rank_color = "inverse"
+            category_list = window['Category'].tolist()
+            upvote_list = window['Upvotes'].tolist()
+            window_labeled = window.copy()
+            window_labeled["Label"] = window_labeled.index.to_series().add(1).astype(str) + ". " + window_labeled["Category"]
 
             # Data for second column (Competition)
             median_size = get_median_size()
@@ -168,6 +188,13 @@ with validate_tab:
                 help="Category rank by total upvotes (higher = more popular)",
                 delta=rank_text,
                 delta_color=rank_color,
+                chart_data=upvote_list,
+                chart_type="line"
+            )
+            st.bar_chart(
+                window_labeled.set_index("Label")["Upvotes"],
+                height=140,  # optional
+                use_container_width=True,
             )
 
             # Competition Metrics
