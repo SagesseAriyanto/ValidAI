@@ -273,7 +273,7 @@ with validate_tab:
 
             # Top and Bottom Tools
             top_tools, bottom_tools = get_top_bottom_tools(category)
-            with st.expander("Most Popular", expanded=True):
+            with st.expander("Most Trending in Category", expanded=True):
                 # Create a list of 3 columns
                 cols = st.columns(3)
 
@@ -288,9 +288,7 @@ with validate_tab:
                                 unsafe_allow_html=True,
                             )
 
-
-
-            with st.expander("Least Popular", expanded=False):
+            with st.expander("Least Trending in Category", expanded=False):
                 cols = st.columns(3)
                 for counter, (_, row) in enumerate(bottom_tools.iterrows()):
                     with cols[counter]:
