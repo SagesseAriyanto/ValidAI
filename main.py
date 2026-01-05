@@ -322,23 +322,22 @@ with chat_tab:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat history
+    # Display chat messages from history
     for message in st.session_state.messages:
-        # Role is either 'user' or 'assistant'
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Get user input
-    if prompt := st.chat_input("Type your message..."):         # walrus operator
-
-        # Append user message and chatbot response
+    # Accept user input
+    if prompt := st.chat_input("Ask me anything about ValidAI..."):
+        # Add and display user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        response = get_resp(prompt)             # chatbot response
-        st.session_state.messages.append({"role": "assistant", "content": response})
+
+        # Display assistant response with streaming
         with st.chat_message("assistant"):
-            st.markdown(response)
+            response = st.write_stream(get_resp(prompt))
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 
 # Dataset Tab
