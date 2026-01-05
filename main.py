@@ -323,20 +323,16 @@ with chat_tab:
         st.session_state.messages = []
 
     # Display chat messages from history
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    with st.container(border=False, height=420):
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
     # Accept user input
     if prompt := st.chat_input("Ask me anything about ValidAI..."):
         # Add and display user message
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        # Display assistant response with streaming
-        with st.chat_message("assistant"):
-            response = st.write_stream(get_resp(prompt))
+        response = "test response"  # Placeholder for response display
         st.session_state.messages.append({"role": "assistant", "content": response})
 
 

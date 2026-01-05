@@ -1,9 +1,11 @@
-import time
+from google import genai
 
-def get_resp(user_input):
-    # Placeholder function for chatbot response
-    response = "This is a placeholder response from ValidAI."
+# 1. Create the client (it will auto-detect 'GEMINI_API_KEY' from your environment)
+client = genai.Client(api_key="YOUR_API_KEY")
 
-    for word in response.split():
-        yield word + " "
-        time.sleep(0.05)  # Simulate streaming delay
+# 2. Generate content (Note: 'models.generate_content' is the new syntax)
+response = client.models.generate_content(
+    model="gemini-2.0-flash", contents="Tell me a haiku about coding."
+)
+
+print(response.text)
