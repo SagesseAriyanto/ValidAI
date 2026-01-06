@@ -73,25 +73,31 @@ def get_resp(chat_history: list) -> str:
     prompt = f"""
     I have a pandas DataFrame 'df' with AI tools.
     Columns:
-    - Name (str)
+    - Name (str): Tool name
     - Category (str): Valid values: {categories_list}
     - Price (str): Valid values: {prices_list}
     - Upvotes (int): Number of upvotes
-    - Link (str)
+    - Link (str): URL
     - Description (str)
-    
-    --- CONVERSATION HISTORY ---
+
+    --- HISTORY ---
     {history_text}
     ----------------------------
     
-    Current User Question: "{current_question}"
+    CURRENT QUESTION: "{current_question}"
 
-    Write 1 line of Python code to get the answer.
-    Rules:
-    1. For Name searches, ALWAYS use 'df[df['Name'].str.contains("search_term", case=False)]'.
-    2. For Category searches, check if the category matches one of the Valid Values.
-    3. Return ONLY the code string.
+    INSTRUCTIONS
+    1. INTENT CHECK:
+    - if the user greets or asks general concepts (e.g., "What is LLM?"), reply with a brief short simple text explanation without code.
+    - if the user asks for tool recommendations, counts, or stats, write PYTHON CODE.
+    2. CODING RULES (For Data Queries):
+    - Return ONLY the python code string. No markdown, explanations, or additional text.
+    - Fuzzy Name Search: ALWAYS use 'df[df['Name'].str.contains("search_term", case=False)]'.
+    - Category Search: Check if the category exists in Valid Values. (same for price)
+    - Sorting: Use '.sort_values(by="Upvotes", ascending=False)' for "best" or "popular" tools.
+    - Columns: Select relevant columns (.e.g., [['Name', 'Link', 'Price']]) to keep output clean.
     """
+    response = None
     for model in models:
         try:
             response = client.models.generate_content(
@@ -100,6 +106,8 @@ def get_resp(chat_history: list) -> str:
             break
         except:
             continue
+    if not response:
+        return f"System overloaded. Please try again later."
 
     code = (
         response.text.replace("```python", "")
@@ -107,17 +115,28 @@ def get_resp(chat_history: list) -> str:
         .replace("`", "")
         .strip()
     )
-    try:
-        if code.startswith("print("):
-            code = code[6:-1]
+    print(f"Generated Code:\n{code}\n")
+    if code.startswith("df") or "pd." in code or "df[" in code:
+        try:
+            if code.startswith("print("):
+                code = code[6:-1]
 
-        # Run the generated code
-        result = eval(code)
-        if isinstance(result, pd.DataFrame):
-            return result.to_markdown(index=False)
-        elif isinstance(result, pd.Series):
-            return result.to_markdown()
-        else:
-            return str(result)
-    except Exception as e:
-        return f"Sorry, I couldn't find that in the database. Error: {str(e)}"
+            # Run the generated code
+            result = eval(code)
+
+            # Format the result
+            if isinstance(result, pd.DataFrame):
+                return result.to_markdown(index=False)
+            
+            elif isinstance(result, pd.Series):
+                return result.to_markdown()
+            
+            else:
+                return str(result)
+            
+        except SyntaxError:
+            
+    else:
+        return code
+
+get_resp([{"role": "user", "content": "give me the most popular ai tool"}])
