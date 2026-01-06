@@ -13,7 +13,11 @@ def stream_text(text):
 
 @st.cache_data(show_spinner=False)
 def load_data():
-    return pd.read_csv("./ai_data.csv")
+    df = pd.read_csv("./ai_data.csv")
+    df["Price"] = df["Price"].fillna("N/A")
+    df['Price'] = df['Price'].replace({"GitHub": "Free", "Open Source": "Free", "Google Colab": "Free"})
+    df.dropna(inplace=True)
+    return df
 
 @st.cache_resource(show_spinner=False)
 def load_models():
@@ -86,10 +90,6 @@ def get_top_bottom_tools(category):
     bottom_tools = bottom_pool.sample(n=min(3, len(bottom_pool)), random_state=None)[
         ["Name", "Price", "Link"]
     ]
-
-    # Fill missing prices
-    top_tools["Price"] = top_tools["Price"].fillna("N/A")
-    bottom_tools["Price"] = bottom_tools["Price"].fillna("N/A")
     return top_tools, bottom_tools
 
 def predict_category(desciption):
