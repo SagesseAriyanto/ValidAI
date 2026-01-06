@@ -71,10 +71,14 @@ def get_resp(chat_history: list) -> str:
 
     # Hybrid prompt with context
     prompt = f"""
-    Pandas DataFrame 'df' containing AI Tools.
-    - Columns: Name, Upvotes, Link, Price, Category
-    - Category: {categories_list}
-    - Price: {prices_list}
+    Pandas DataFrame 'df' of AI Tools.
+    SCHEMA:
+    - Name (str): Tool name
+    - Upvotes (int): User popularity count (Higher is better)
+    - Link (str): Website URL
+    - Price (str): {prices_list}
+    - Category (str): {categories_list}
+    - Description (str): Summary of what the tool does
 
     HISTORY:
     {history_text}
@@ -82,14 +86,14 @@ def get_resp(chat_history: list) -> str:
     QUESTION: "{current_question}"
 
     INSTRUCTIONS:
-    1. GENERAL: For greetings or concepts, reply with plain text. DO NOT use the word 'df' in text.
-    2. DATA QUERY: Write 1 line of PYTHON CODE.
-       - "Popular"/"Top"/"Best": Use `df.sort_values(by='Upvotes', ascending=False)`
-       - "Find"/"Search": Use `df[df['Name'].str.contains("query", case=False)]`
-       - FILTERING: Use `.isin(['Free', 'Paid'])` for prices/categories.
-       - FORMATTING: ALWAYS use `.head(n)[['Name', 'Link', 'Upvotes']]` to select columns and limit rows.
-       - SAFETY: Return ONLY the code string.
-        """
+    1. GENERAL CHAT: If user greets or asks concepts, reply with plain text.
+    2. DATA QUERY: Write a SINGLE Python Expression.
+       - SYNONYMS: If user asks for 'users', 'popularity', 'traffic', or 'best', use the 'Upvotes' column.
+       - COLUMNS: Select the exact columns the user asked for.
+         * Default if unspecified: `[['Name', 'Link', 'Upvotes']]`
+       - FORMATTING: ALWAYS use `.head(n)` (even for 1 result) to return a DataFrame.
+       - SAFETY: Return ONLY the raw code string. DO NOT use print().
+    """
     response = None
     for model in models:
         try:
@@ -100,23 +104,26 @@ def get_resp(chat_history: list) -> str:
         except:
             continue
     if not response:
-        return f"System overloaded. Please try again."
+        return f"System overloaded. Please try again later."
 
-    # Execute generated code
+    # Clean generated code
     code = (
         response.text.replace("```python", "")
         .replace("```", "")
         .replace("`", "")
         .strip()
     )
-    print(f"Generated Code:\n{code}\n")
-    # If response is plain text, return it immediately
-    if code.startswith("df") or code.startswith("df[") or "df" in code or "print(" in code or "pd." in code:
+    # Strip print()
+    if code.startswith("print(") and code.endswith(")"):
+        code = code[6:-1].strip()
+    
+    # Remove any trailing print statements
+    if "print(" in code:
+        code = code.split("print(")[0].strip()
+   
+    if code.startswith("df") or code.startswith("pd."):
         # If response is code, run it
         try:
-            if code.startswith("print("):
-                code = code[6:-1]
-
             # Run the generated code
             result = eval(code)
 
@@ -137,3 +144,5 @@ def get_resp(chat_history: list) -> str:
             return f"I couldn't process that query. Try rephrasing."
     else:
         return code
+
+get_resp([{"role": "user", "content": "Hello"}])  # Warm up the cache

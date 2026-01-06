@@ -131,7 +131,7 @@ st.markdown(
 )
 
 # Tabs for different functionalities
-validate_tab, chat_tab, dataset_tab = st.tabs(["Validate", "Chat", "Dataset"])
+validate_tab, chat_tab, dataset_tab = st.tabs(["Validate", "Chat (Beta)", "Dataset"])
 
 # Validate Tab
 with validate_tab:
@@ -343,7 +343,7 @@ with chat_tab:
                 st.markdown(message["content"])
 
     # Accept user input
-    if prompt := st.chat_input("Ask about tools, prices, or categories"):
+    if prompt := st.chat_input("Ask about tools, prices, or categories", max_chars=150):
         # Add and display user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with chat_container:
