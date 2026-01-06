@@ -50,23 +50,41 @@ def get_genai_client():
     return genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
-def get_resp(question: str) -> str:
+def get_resp(chat_history: list) -> str:
     # Load data and initialize client
     df, categories_list, prices_list = load_chatbot_data()
     client = get_genai_client()
     models = get_available_models()
 
+    if df.empty: return "Error: Database not loaded."
+    if not chat_history: return "Hello! How can I help you?"
+
+    # Extract the latest question and past history
+    current_question = chat_history[-1]["content"]
+    past_history = chat_history[:-1][-5:]
+
+    history_text = ""
+    for msg in past_history:
+        role = "User" if msg["role"] == "user" else "AI"
+        content = str(msg["content"])[:200]
+        history_text += f"{role}: {content}\n"
+
+    # Hybrid prompt with context
     prompt = f"""
     I have a pandas DataFrame 'df' with AI tools.
     Columns:
-    - Name (str): The tool name
+    - Name (str)
     - Category (str): Valid values: {categories_list}
     - Price (str): Valid values: {prices_list}
-    - Upvotes (int): Number of upvotes (higher is more popular)
-    - Link (str): The URL
-    - Description (str): What it does
-
-    User Question: "{question}"
+    - Upvotes (int): Number of upvotes
+    - Link (str)
+    - Description (str)
+    
+    --- CONVERSATION HISTORY ---
+    {history_text}
+    ----------------------------
+    
+    Current User Question: "{current_question}"
 
     Write 1 line of Python code to get the answer.
     Rules:
@@ -74,10 +92,14 @@ def get_resp(question: str) -> str:
     2. For Category searches, check if the category matches one of the Valid Values.
     3. Return ONLY the code string.
     """
-
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-exp", contents=prompt
-    )
+    for model in models:
+        try:
+            response = client.models.generate_content(
+                model=model, contents=prompt
+                )
+            break
+        except:
+            continue
 
     code = (
         response.text.replace("```python", "")
