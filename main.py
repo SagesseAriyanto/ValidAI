@@ -364,16 +364,28 @@ with chat_tab:
 with dataset_tab:
     try:
         df = load_data()
-        caption, search  = st.columns([6,4])
+        caption, search  = st.columns([4,6], gap="medium", border=True, vertical_alignment="bottom")
+        col = None
+        search_mode = st.pills(
+            "",
+            options=["Name", "Description"],
+            selection_mode="single",
+            default="Name",
+            label_visibility="collapsed"       
+            )
+        if search_mode == "Description":
+            col = "Description"
+        else:
+            col = "Name"
 
         with search:
             query = st.text_input(
                 label="",
-                placeholder="Enter tool name...",
+                placeholder="Enter keywords...",
                 label_visibility="collapsed",
             )
         if query:
-            filtered_df = df[df['Name'].str.contains(query, case=False, na=False)]
+            filtered_df = df[df[col].str.contains(query, case=False, na=False)]
         else:
             filtered_df = df
 
