@@ -364,58 +364,67 @@ with chat_tab:
 with dataset_tab:
     try:
         df = load_data()
-        download, _ = st.columns([8,2])
-        with download:
-            # Convert DF to CSV
-            csv = df.to_csv(index=False).encode("utf-8")
+        caption, search  = st.columns([6,4])
 
-            # Download button
-            st.download_button(
-                label="Download",
-                data=csv,
-                file_name="validai_tools.csv",
-                mime="text/csv",
-                width="content"
+        with search:
+            query = st.text_input(
+                label="",
+                placeholder="Search by name...",
+                label_visibility="collapsed"
             )
+        if query:
+            filtered_df = df[df['Name'].str.contains(query, case=False, na=False)]
+        else:
+            filtered_df = df
 
-        column_config = {
-            "Name": st.column_config.TextColumn(
-                "Name",
-                help="Tool Name",
-                width="medium",
-            ),
-            "Category": st.column_config.TextColumn(
-                "Category",
-                help="Main Category",
-                width="stretch",
-            ),
-            "Price": st.column_config.TextColumn(
-                "Price",
-                help="Cost Model",
-                width="stretch",
-            ),
-            "Upvotes": st.column_config.NumberColumn(
-                "Upvotes",
-                help="Popularity Score",
-                width="stretch",
-            ),
-            "Link": st.column_config.LinkColumn(
-                "Website",
-                help="Website Link",
-                width="stretch",
-            ),
-            "Description": st.column_config.TextColumn(
-                "Description",
-                help="Feature Summary",
-                width="stretch",
+        with caption:
+            st.caption(f"Showing {len(filtered_df)} of {len(df)} AI Tools")
+
+        if filtered_df.empty:
+            st.info("No tools found matching that name.")
+        else:
+            column_config = {
+                "Name": st.column_config.TextColumn(
+                    "Name",
+                    help="Tool Name",
+                    width="medium",
+                ),
+                "Category": st.column_config.TextColumn(
+                    "Category",
+                    help="Main Category",
+                    width="stretch",
+                ),
+                "Price": st.column_config.TextColumn(
+                    "Price",
+                    help="Cost Model",
+                    width="stretch",
+                ),
+                "Upvotes": st.column_config.NumberColumn(
+                    "Upvotes",
+                    help="Popularity Score",
+                    width="stretch",
+                ),
+                "Link": st.column_config.LinkColumn(
+                    "Website",
+                    help="Website Link",
+                    width="stretch",
+                ),
+                "Description": st.column_config.TextColumn(
+                    "Description",
+                    help="Feature Summary",
+                    width="stretch",
+                )
+            }
+            num_rows = len(filtered_df)
+            dynamic_height = int((num_rows + 1) * 35.2)
+            final_height = min(dynamic_height, 700)
+
+            st.dataframe(
+                filtered_df[["Name", "Category", "Price", "Upvotes", "Link", "Description"]],
+                use_container_width=True,
+                column_config=column_config,
+                hide_index=True,
+                height =final_height
             )
-        }
-        st.dataframe(
-            df[["Name", "Category", "Price", "Upvotes", "Link", "Description"]],
-            use_container_width=True,
-            column_config=column_config,
-            hide_index=True,
-            height =650
-        )
-    except:
-        st.warning("Could not load dataset.")
+    except Exception as e:
+        st.warning(f"Could not load dataset. Error: {e}")
