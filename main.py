@@ -364,21 +364,22 @@ with chat_tab:
 with dataset_tab:
     try:
         df = load_data()
-        caption, search  = st.columns([4,6], gap="medium", border=True, vertical_alignment="bottom")
+        caption, search  = st.columns([4,6], gap="medium", vertical_alignment="bottom")
         col = None
-        search_mode = st.pills(
-            "",
-            options=["Name", "Description"],
-            selection_mode="single",
-            default="Name",
-            label_visibility="collapsed"       
-            )
-        if search_mode == "Description":
-            col = "Description"
-        else:
-            col = "Name"
 
+        # Search columun
         with search:
+            search_mode = st.pills(
+                "",
+                options=["Name", "Description"],
+                selection_mode="single",
+                default="Name",
+                label_visibility="collapsed",
+            )
+            if search_mode == "Description":
+                col = "Description"
+            else:
+                col = "Name"
             query = st.text_input(
                 label="",
                 placeholder="Enter keywords...",
@@ -389,8 +390,10 @@ with dataset_tab:
         else:
             filtered_df = df
 
+        # Caption column
         with caption:
-            st.caption(f"Showing {len(filtered_df)} of {len(df)} AI Tools")
+            with st.container(border=True):
+                st.caption(f"Showing {len(filtered_df)} of {len(df)} AI Tools")
 
         if filtered_df.empty:
             st.info("No tools found matching that name.")
@@ -433,11 +436,11 @@ with dataset_tab:
 
             st.dataframe(
                 filtered_df[["Name", "Category", "Price", "Upvotes", "Link", "Description"]],
-                use_container_width=True,
                 column_config=column_config,
                 hide_index=True,
                 height =final_height,
-                selection_mode=["single-column", "single-row", "multi-cell"]
+                selection_mode=["single-column", "single-row", "multi-cell"],
+                width="stretch"
             )
     except Exception as e:
         st.warning(f"Could not load dataset. Error: {e}")
