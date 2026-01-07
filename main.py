@@ -402,7 +402,7 @@ with dataset_tab:
                 "Name": st.column_config.TextColumn(
                     "Name",
                     help="Tool Name",
-                    width=120,
+                    width=122,
                 ),
                 "Category": st.column_config.TextColumn(
                     "Category",
