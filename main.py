@@ -396,43 +396,43 @@ with dataset_tab:
                 st.caption(f"Showing {len(filtered_df)} of {len(df)} AI Tools")
 
         if filtered_df.empty:
-            st.info("No tools found matching that name.")
+            st.info("No tools found matching that name")
         else:
             column_config = {
                 "Name": st.column_config.TextColumn(
                     "Name",
                     help="Tool Name",
-                    width="medium",
+                    width=120,
                 ),
                 "Category": st.column_config.TextColumn(
                     "Category",
                     help="Main Category",
-                    width="stretch",
+                    width=140,
                 ),
                 "Price": st.column_config.TextColumn(
                     "Price",
                     help="Cost Model",
-                    width="stretch",
+                    width="small",
                 ),
                 "Upvotes": st.column_config.NumberColumn(
                     "Upvotes",
                     help="Popularity Score",
-                    width="stretch",
+                    width=60
                 ),
                 "Link": st.column_config.LinkColumn(
                     "Website",
                     help="Website Link",
-                    width="stretch",
+                    display_text="🔗 Visit",
+                    width=60
                 ),
                 "Description": st.column_config.TextColumn(
                     "Description",
                     help="Feature Summary",
-                    width="stretch",
-                )
+                ),
             }
             num_rows = len(filtered_df)
             dynamic_height = int((num_rows + 1) * 35.2)
-            final_height = min(dynamic_height, 700)
+            final_height = min(dynamic_height, 600)
 
             st.dataframe(
                 filtered_df[["Name", "Category", "Price", "Upvotes", "Link", "Description"]],
