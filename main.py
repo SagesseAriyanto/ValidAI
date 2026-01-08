@@ -114,19 +114,18 @@ def predict_success(description, category, price):
     success_prob = int(success_model.predict_proba(features)[0][1] * 100)
     return success_prob
 
-
 # Streamlit title and subtitle
-st.markdown(
-    "<div style='text-align: center; font-size: 4rem; margin-bottom: -2.5rem;'>🤖</div>",
-    unsafe_allow_html=True,
-)
-st.title("ValidAI", anchor=False, text_alignment="center")
-st.markdown(
-    "<div style='text-align: center; margin-top: -1rem; margin-bottom: 0.7rem; font-size: 1.3rem; font-weight: 660;'>Validate your vision against <span style='background-color: #DDD6FE; color: #374151; padding: 2.5px 7px; border-radius: 5px; font-weight: 700; margin-left: 3px;'>4000 existing AI tools</span></div>",
-    unsafe_allow_html=True,
-)
+with st.container(border=False):
+    st.markdown(
+        "<div style='text-align: center; font-size: 4rem; margin-bottom: -2.5rem;'>🤖</div>",
+        unsafe_allow_html=True,
+    )
+    st.title("ValidAI", anchor=False, text_alignment="center")
+    st.markdown(
+        "<div style='text-align: center; margin-top: -1rem; margin-bottom: 0.7rem; font-size: 1.3rem; font-weight: 660;'>Validate your vision against <span style='background-color: #DDD6FE; color: #374151; padding: 2.5px 7px; border-radius: 5px; font-weight: 700; margin-left: 3px;'>4000 existing AI tools</span></div>",
+        unsafe_allow_html=True,
+    )
 
-    
 # Tabs for different functionalities
 validate_tab, chat_tab, dataset_tab = st.tabs(["Validate", "Chat (Beta)", "Dataset"])
 

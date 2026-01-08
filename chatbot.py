@@ -144,5 +144,3 @@ def get_resp(chat_history: list) -> str:
             return f"I couldn't process that query. Try rephrasing."
     else:
         return code
-
-get_resp([{"role": "user", "content": "Hello"}])  # Warm up the cache
