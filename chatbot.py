@@ -37,21 +37,35 @@ def get_available_models():
     if os.path.exists(models_file):
         with open(models_file, "r") as file:
             return json.load(file)
-    
-    models_list = []
-    try:
-        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-        for model in client.models.list():
-            if "generateContent" in model.supported_actions:
+    else:
+        try:
+            valid_models = [
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-001",
+                "gemini-2.0-flash-lite",
+                "gemini-exp-1206",
+                "gemini-pro-latest",
+                "gemini-flash-latest",
+            ]
+            models_list = []
+            client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+            for model in client.models.list():
                 model_name = model.name.replace("models/", "")
-                models_list.append(model_name)
+                if model_name in valid_models:
+                    models_list.append(model_name)
+                else:
+                    continue
 
-        # Save models to a JSON file
-        with open(models_file, "w") as file:
-            json.dump(models_list, file)
-    except:
-        pass
-    return models_list
+                # Save models to a JSON file
+            with open(models_file, "w") as file:
+                    json.dump(models_list, file)
+            return models_list
+        except:
+            return
+
+get_available_models()
 
 
 @st.cache_resource
