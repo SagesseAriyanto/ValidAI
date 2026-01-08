@@ -22,8 +22,13 @@ def load_chatbot_data():
     # Create unique lists from DataFrame columns
     categories_list = ", ".join(df["Category"].unique())
     prices_list = ", ".join(df["Price"].unique())
-
-    return df, categories_list, prices_list
+    columns = ", ".join(df.columns.tolist())
+    return f"""
+    dataset_columns: {columns}
+    dataset_categories: {categories_list}
+    dataset_prices: {prices_list}
+    total_tools: {len(df)}
+    """
 
 @st.cache_data
 def get_available_models():
@@ -31,18 +36,21 @@ def get_available_models():
 
     if os.path.exists(models_file):
         with open(models_file, "r") as file:
-            models_list = json.load(file)
-        return models_list
+            return json.load(file)
+    
     models_list = []
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    for model in client.models.list():
-        if "generateContent" in model.supported_actions:
-            model_name = model.name.replace("models/", "")
-            models_list.append(model_name)
+    try:
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        for model in client.models.list():
+            if "generateContent" in model.supported_actions:
+                model_name = model.name.replace("models/", "")
+                models_list.append(model_name)
 
-    # Save models to a JSON file
-    with open(models_file, "w") as file:
-        json.dump(models_list, file)
+        # Save models to a JSON file
+        with open(models_file, "w") as file:
+            json.dump(models_list, file)
+    except:
+        pass
     return models_list
 
 
