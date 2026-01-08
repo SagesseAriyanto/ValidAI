@@ -116,7 +116,7 @@ def predict_success(description, category, price):
 
 # Configure streamlit settings
 st.set_page_config(
-    page_title="ValidAI",
+    page_title="ValidAI - AI Startup Validator",
     page_icon="🤖",
     layout="wide",
     menu_items={
@@ -129,8 +129,8 @@ st.set_page_config(
         **Created by:** Sagesse Ariyanto
         **GitHub:** [SagesseAriyanto](https://github.com/SagesseAriyanto)
         **Contact:** [sagesseariyanto@gmail.com](mailto:sagesseariyanto@gmail.com)
-        """
-    }
+        """,
+    },
 )
 
 
