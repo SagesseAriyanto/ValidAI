@@ -140,12 +140,18 @@ with st.container(border=False):
     )
     st.title("ValidAI", anchor=False, text_alignment="center")
     st.markdown(
-        "<div style='text-align: center; margin-top: -1rem; margin-bottom: 0.7rem; font-size: 1.3rem; font-weight: 660;'>Validate your vision against <span style='background-color: #DDD6FE; color: #374151; padding: 2.5px 7px; border-radius: 5px; font-weight: 700; margin-left: 3px;'>4000 existing AI tools</span></div>",
+        "<div style='text-align: center; margin-top: -1rem; margin-bottom: 0.6rem; font-size: 1.3rem; font-weight: 660;'>Validate your vision against <span style='background-color: #DDD6FE; color: #374151; padding: 2.5px 7px; border-radius: 5px; font-weight: 700; margin-left: 3px;'>4000 existing AI tools</span></div>",
+        unsafe_allow_html=True,
+    )
+    # Copyright
+    st.markdown(
+        "<div style='text-align: center; margin-bottom: 0.7rem; font-weight: 600;'>© Created by <a href='https://sagesseariyanto.com/' style='font-weight: bold; text-decoration: none; color: inherit;'>Sagesse Ariyanto</a></div>",
         unsafe_allow_html=True,
     )
 
     # Tabs for different functionalities
     validate_tab, chat_tab, dataset_tab = st.tabs(["Validate", "Chat (Beta)", "Dataset"])
+
 
 # Validate Tab
 with validate_tab:
@@ -463,8 +469,3 @@ with dataset_tab:
             )
     except Exception as e:
         st.warning(f"Could not load dataset. Error: {e}")
-
-st.markdown(
-    "<div style='text-align: center; margin-top: 7rem; margin-bottom: 0.7rem; font-size: 1.3rem; font-weight: 660;'>Created by <span style='background-color: #DDD6FE; color: #374151; padding: 2.5px 7px; border-radius: 5px; font-weight: 700; margin-left: 3px;'>Sagesse Ariyanto</span></div>",
-    unsafe_allow_html=True,
-)
