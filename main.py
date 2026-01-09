@@ -344,26 +344,23 @@ with chat_tab:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display existing messages if chat history exists
-    else:
-        info_section = st.container()
-        with info_section:
-            if len(st.session_state.messages) > 2:
-                pairs = (len(st.session_state.messages) - 2) // 2
-                with st.expander(f"Chat History ({pairs})", expanded=False, icon="💬"):
-                    history_container = st.container(border=False, height=200)
-                    with history_container:
-                        # Display all but last 2 messages
-                        for message in st.session_state.messages[:-2]:
-                            with st.chat_message(message["role"]):
-                                st.markdown(message["content"])
+    # Display welcome message if no chat history
+    if not st.session_state.messages:
+        st.info(
+            "Ask me about AI concepts, pricing models, or tool categories.",
+            icon="👋",
+        )
 
-            # Display info message if chat history <= 2
-            else:
-                st.info(
-                    "Ask me about AI concepts, pricing models, or tool categories.",
-                    icon="👋",
-                )
+    # Display existing messages in chat history
+    else:
+        pairs = (len(st.session_state.messages)) // 2
+        with st.expander(f"Chat History ({pairs})", expanded=False, icon="💬"):
+            history_container = st.container(border=False, height=150)
+            with history_container:
+                # Display everything EXCEPT the last 2
+                for message in st.session_state.messages:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
 
     # Input box for new messages
     if prompt := st.chat_input(
@@ -371,8 +368,10 @@ with chat_tab:
     ):
         messages_container = st.container(border=False, height=170)
 
+        # Save user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with messages_container:
+
             # User Message
             with st.chat_message("user"):
                 st.markdown(prompt)
@@ -381,9 +380,9 @@ with chat_tab:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     response = get_resp(st.session_state.messages)
-                st.write_stream(stream_text(response))
+                    st.write_stream(stream_text(response))
 
-        # Save to history (invisible step)
+        # Save assistant response
         st.session_state.messages.append({"role": "assistant", "content": response})
 
 # Dataset Tab
