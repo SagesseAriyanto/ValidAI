@@ -287,18 +287,22 @@ with validate_tab:
                 color="Metric",
                 barmode="group",
                 log_y=True,  # Log scale for visibility
-                color_discrete_map={"Upvotes": "#C4B5FD", "Competition": "#FB923C"},
+                color_discrete_map={"Upvotes": "#818CF8", "Competition": "#F97316"},
                 hover_data={"Label": False, "Metric": True, "Value": True}
             )
             fig.update_xaxes(
                 title_text="",
                 tickangle=20,
             )
-            fig.update_yaxes(title_text="")
+            fig.update_yaxes(title_text="", showgrid=True, gridcolor='#1E293B')
             fig.update_layout(
-                height=400,
+                height=420,
+                paper_bgcolor="#0F172A",
+                plot_bgcolor="#0F172A",
+                font=dict(color="#E5E7EB", size=15),
                 title=dict(
                     text="Overview",
+                    font=dict(size=18, color="#F8FAFC"),
                 ),
                 legend=dict(
                     title="",
@@ -307,11 +311,18 @@ with validate_tab:
                     y=1.02,
                     xanchor="right",
                     x=1,
+                    font=dict(size=13),
+                ),
+                hoverlabel=dict(
+                    bgcolor="#020617",
+                    font_size=14,
+                    font_color="#F9FAFB",
+                    bordercolor="#334155"
                 ),
             )
             st.plotly_chart(fig)
 
-            # Top and Bottom Tools
+            # Popular and Unpopular Tools
             top_tools, bottom_tools = get_top_bottom_tools(category)
             with st.expander("Most Trending in Category", expanded=True):
                 # Create a list of 3 columns
