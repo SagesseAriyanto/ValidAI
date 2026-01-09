@@ -357,15 +357,12 @@ with chat_tab:
         with st.expander(f"Chat History ({pairs})", expanded=False, icon="💬"):
             history_container = st.container(border=False, height=150)
             with history_container:
-                # Display everything EXCEPT the last 2
                 for message in st.session_state.messages:
                     with st.chat_message(message["role"]):
                         st.markdown(message["content"])
 
     # Input box for new messages
-    if prompt := st.chat_input(
-        "Ask about AI categories, pricing, or concepts...", max_chars=150
-    ):
+    if prompt := st.chat_input("Ask me anything...", max_chars=150):
         messages_container = st.container(border=False, height=170)
 
         # Save user message
