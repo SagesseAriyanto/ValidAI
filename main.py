@@ -347,7 +347,7 @@ with chat_tab:
     # Display welcome message if no chat history
     if not st.session_state.messages:
         st.info(
-            "Ask me about AI concepts, pricing models, or tool categories.",
+            "Ask general questions or browse categories, prices, etc.",
             icon="👋",
         )
 
