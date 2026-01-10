@@ -4,10 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import Ridge, Lasso, ElasticNet
-from sklearn.model_selection import GridSearchCV
 import pickle
-from sklearn.metrics import mean_absolute_error, r2_score
 import numpy as np
 
 # Load dataset
